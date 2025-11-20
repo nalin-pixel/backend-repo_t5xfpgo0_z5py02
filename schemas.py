@@ -12,9 +12,9 @@ Model name is converted to lowercase for the collection name:
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 
-# Example schemas (replace with your own):
+# Example schemas (retain for reference/examples)
 
 class User(BaseModel):
     """
@@ -38,11 +38,32 @@ class Product(BaseModel):
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
-# --------------------------------------------------
+# Gas station app schemas
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class GasStation(BaseModel):
+    """
+    Gas stations collection schema
+    Collection name: "gasstation"
+    """
+    name: str = Field(..., description="Station name")
+    address: str = Field(..., description="Street address")
+    city: str = Field(..., description="City")
+    state: str = Field(..., min_length=2, max_length=2, description="State code")
+    zip_code: Optional[str] = Field(None, description="ZIP/Postal code")
+    latitude: Optional[float] = Field(None, description="Latitude")
+    longitude: Optional[float] = Field(None, description="Longitude")
+    phone: Optional[str] = Field(None, description="Phone number")
+    fuel_types: List[str] = Field(default_factory=list, description="Available fuel types, e.g., ['regular','midgrade','premium','diesel']")
+    amenities: List[str] = Field(default_factory=list, description="Amenities like car_wash, air_pump, atm, restroom")
+    open_24_hours: bool = Field(False, description="Open 24 hours")
+    hours: Optional[str] = Field(None, description="Opening hours description")
+
+class Price(BaseModel):
+    """
+    Fuel price reports collection
+    Collection name: "price"
+    """
+    station_id: str = Field(..., description="ID of the gas station")
+    fuel_type: str = Field(..., description="Fuel type: regular | midgrade | premium | diesel")
+    price: float = Field(..., gt=0, description="Price per gallon" )
+    source: Optional[str] = Field(None, description="Source of the price (user, web, sign)")
